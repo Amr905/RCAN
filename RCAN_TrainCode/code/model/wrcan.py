@@ -118,8 +118,11 @@ class RCAN(nn.Module):
         
     def forward(self, x):
         x = self.sub_mean(x)
+        
+        print (x)
         #s = self.skip(x)
         x = self.head(x)
+         print (x)
         s = self.skip(x)
         x = self.body(x)
 
