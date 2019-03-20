@@ -106,7 +106,7 @@ class RCAN(nn.Module):
             conv(n_feats, args.n_colors, kernel_size)]
         out_feats = scale*scale*args.n_colors
         #skip = []
-        skip = [conv(args.n_colors, n_feats, kernel_size)]
+        skip = [nn.Conv2d(args.n_colors, out_feats, 5, padding=5//2)]
         #skip.append(nn.PixelShuffle(scale))
         self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
