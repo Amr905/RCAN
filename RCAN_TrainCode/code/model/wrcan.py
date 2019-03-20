@@ -122,7 +122,7 @@ class RCAN(nn.Module):
         print (x)
         #s = self.skip(x)
         x = self.head(x)
-         print (x)
+        print (x)
         s = self.skip(x)
         x = self.body(x)
 
