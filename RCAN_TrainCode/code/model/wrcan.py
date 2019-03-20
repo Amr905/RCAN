@@ -106,14 +106,16 @@ class RCAN(nn.Module):
             conv(n_feats, args.n_colors, kernel_size)]
         out_feats = scale*scale*args.n_colors
         #skip = []
-        skip = [nn.Conv2d(args.n_colors, out_feats, 5, padding=5//2)]
-        #skip.append(nn.PixelShuffle(scale))
+        modules_skip = [conv(args.n_colors, n_feats, kernel_size)]
+        modules_skip.append(nn.PixelShuffle(scale))
         self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
+        
+        self.skip = nn.Sequential(*modules_skip)
         self.head = nn.Sequential(*modules_head)
         self.body = nn.Sequential(*modules_body)
         self.tail = nn.Sequential(*modules_tail)
-        self.skip = nn.Sequential(*skip)
+        
     def forward(self, x):
         x = self.sub_mean(x)
        # s = self.skip(x)
