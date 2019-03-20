@@ -107,7 +107,7 @@ class RCAN(nn.Module):
         out_feats = scale*scale*args.n_colors
         #skip = []
         skip = [conv(args.n_colors, n_feats, kernel_size)]
-        skip.append(nn.PixelShuffle(scale))
+        #skip.append(nn.PixelShuffle(scale))
         self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
         self.head = nn.Sequential(*modules_head)
