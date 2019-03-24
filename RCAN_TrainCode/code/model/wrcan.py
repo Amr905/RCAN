@@ -107,8 +107,9 @@ class RCAN(nn.Module):
         out_feats = scale*scale*args.n_colors
         #skip = []
         modules_skip = [conv(args.n_colors, n_feats, kernel_size)]
-        modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
-        modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
+        #modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
+        #modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
+        modules_skip.append(nn.PixelShuffle(2));
         self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
         
