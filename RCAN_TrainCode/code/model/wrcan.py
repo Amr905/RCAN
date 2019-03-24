@@ -102,11 +102,11 @@ class RCAN(nn.Module):
 
         # define tail module
         modules_tail = [
-            nn.PixelShuffle(scale),#common.Upsampler(conv, scale, n_feats, act=False),
+            common.Upsampler(conv, scale, n_feats, act=False),
             conv(n_feats, args.n_colors, kernel_size)]
         out_feats = scale*scale*args.n_colors
         #skip = []
-        modules_skip = [conv(n_feats, args.n_colors, kernel_size)]
+        modules_skip = [conv(n_feats*4, args.n_colors, kernel_size)]
         modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
         self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
@@ -119,10 +119,10 @@ class RCAN(nn.Module):
     def forward(self, x):
         x = self.sub_mean(x)
         
-        print (x)
+        #print (x)
         #s = self.skip(x)
         x = self.head(x)
-        print (x)
+        #print (x)
         s = self.skip(x)
         x = self.body(x)
 
