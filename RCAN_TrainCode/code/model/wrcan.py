@@ -117,10 +117,11 @@ class RCAN(nn.Module):
         self.tail = nn.Sequential(*modules_tail)
         
     def forward(self, x):
+        s = self.skip(x)
+       
         x = self.sub_mean(x)
         
         #print (x)
-        s = self.skip(x)
         x = self.head(x)
         #print (x)
         #s = self.skip(x)
