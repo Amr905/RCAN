@@ -123,6 +123,7 @@ class RCAN(nn.Module):
         #x = (x - self.rgb_mean.cuda()*255)/127.5
         x = self.sub_mean(x)
         s = self.skip(x)
+        s = self.skip(x)
         #print (x)
         x = self.head(x)
         #print (x)
