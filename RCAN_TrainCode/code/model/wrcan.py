@@ -107,7 +107,7 @@ class RCAN(nn.Module):
         out_feats = scale*scale*args.n_colors
         #skip = []
         modules_skip = [conv(n_feats*4,args.n_colors//4, kernel_size)]
-        modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
+        #modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
         self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
         
