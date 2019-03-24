@@ -129,12 +129,12 @@ class RCAN(nn.Module):
         #s = self.skip(x)
         x = self.body(x)
         
-        x += s
+        #x += s
         
         x = self.tail(x)
         #x += s
         x = self.add_mean(x)
-
+        x += s
         return x
 
     def load_state_dict(self, state_dict, strict=False):
