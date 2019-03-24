@@ -123,7 +123,7 @@ class RCAN(nn.Module):
         #x = (x - self.rgb_mean.cuda()*255)/127.5
         x = self.sub_mean(x)
         s = self.skip(x)
-        s = self.skip(x)
+        v = self.skip(x)
         #print (x)
         x = self.head(x)
         #print (x)
@@ -135,7 +135,7 @@ class RCAN(nn.Module):
         x = self.tail(x)
         #x += s
         x = self.add_mean(x)
-        x += s
+        x += s+v
         return x
 
     def load_state_dict(self, state_dict, strict=False):
