@@ -106,7 +106,7 @@ class RCAN(nn.Module):
             conv(n_feats, args.n_colors, kernel_size)]
         out_feats = scale*scale*args.n_colors
         #skip = []
-        modules_skip = [conv(n_feats*4,args.n_colors//4, kernel_size)]
+        modules_skip = [conv(args.n_colors, n_feats, kernel_size)]
         #modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
         self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
@@ -118,8 +118,8 @@ class RCAN(nn.Module):
         
     def forward(self, x):
         
-        x = (x - self.rgb_mean.cuda()*255)/127.5
-        #x = self.sub_mean(x)
+        #x = (x - self.rgb_mean.cuda()*255)/127.5
+        x = self.sub_mean(x)
         s = self.skip(x)
         #print (x)
         x = self.head(x)
