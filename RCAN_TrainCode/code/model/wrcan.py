@@ -128,9 +128,11 @@ class RCAN(nn.Module):
         #print (x)
         #s = self.skip(x)
         x = self.body(x)
-
-        x = self.tail(x)
+        
         x += s
+        
+        x = self.tail(x)
+        #x += s
         x = self.add_mean(x)
 
         return x
