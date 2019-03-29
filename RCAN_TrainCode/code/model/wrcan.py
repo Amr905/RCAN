@@ -82,14 +82,14 @@ class RCAN(nn.Module):
         reduction = args.reduction
         scale = args.scale[0]
         act = nn.ReLU(True)
-
+        wn = lambda x: torch.nn.utils.weight_norm(x)
         # RGB mean for DIV2K
         rgb_mean = (0.4488, 0.4371, 0.4040)
         rgb_std = (1.0, 1.0, 1.0)
         self.sub_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std)
 
         # define head module
-        modules_head = [conv(args.n_colors, n_feats, kernel_size)]
+        modules_head = [wn(conv(args.n_colors, n_feats, kernel_size))]
 
         # define body module
         modules_body = [
@@ -98,12 +98,12 @@ class RCAN(nn.Module):
                 res_scale=args.res_scale, n_resblocks=n_resblocks) \
             for _ in range(n_resgroups)]
 
-        modules_body.append(conv(n_feats, n_feats, kernel_size))
+        modules_body.append(wn(conv(n_feats, n_feats, kernel_size)))
 
         # define tail module
         modules_tail = [
             common.Upsampler(conv, scale, n_feats, act=False),
-            conv(n_feats, args.n_colors, kernel_size)]
+            wn(conv(n_feats, args.n_colors, kernel_size))]
         out_feats = scale*scale*args.n_colors
         #skip = []
         modules_skip = [conv(args.n_colors, n_feats, kernel_size)]
@@ -114,7 +114,7 @@ class RCAN(nn.Module):
         self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
         
-        self.skip = nn.Sequential(*modules_skip)
+        #self.skip = nn.Sequential(*modules_skip)
         self.head = nn.Sequential(*modules_head)
         self.body = nn.Sequential(*modules_body)
         self.tail = nn.Sequential(*modules_tail)
@@ -123,19 +123,25 @@ class RCAN(nn.Module):
         
         #x = (x - self.rgb_mean.cuda()*255)/127.5
         x = self.sub_mean(x)
-        s = self.skip(x)
+        #s = self.skip(x)
         #v = self.skip(x)
         #print (x)
         x = self.head(x)
         #print (x)
         #s = self.skip(x)
-        x = self.body(x)
+        
+        #x = self.body(x)
         
         #x += s
         
-        x = self.tail(x)
+        #x = self.tail(x)
         #x += s
+        res = self.body(x)
+        res += x
+
+        x = self.tail(res)
         x = self.add_mean(x)
+        
         #x += s+v
         return x
 
