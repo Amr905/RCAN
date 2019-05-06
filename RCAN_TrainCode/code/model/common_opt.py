@@ -30,7 +30,7 @@ class BasicBlock(nn.Sequential):
             in_channels, out_channels, kernel_size,
             padding=(kernel_size//2), stride=stride, bias=bias))
         ]
-        if bn: m.append(wn(out_channels))
+        if bn: m.append(nn.BatchNorm2d(out_channels))
         if act is not None: m.append(act)
         super(BasicBlock, self).__init__(*m)
 
