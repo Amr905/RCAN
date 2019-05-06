@@ -25,12 +25,12 @@ class BasicBlock(nn.Sequential):
     def __init__(
         self, in_channels, out_channels, kernel_size, stride=1, bias=False,
         bn=True, act=nn.ReLU(True)):
-
-        m = [nn.Conv2d(
+        wn = lambda x: torch.nn.utils.weight_norm(x)
+        m = [wn(nn.Conv2d(
             in_channels, out_channels, kernel_size,
-            padding=(kernel_size//2), stride=stride, bias=bias)
+            padding=(kernel_size//2), stride=stride, bias=bias))
         ]
-        if bn: m.append(nn.BatchNorm2d(out_channels))
+        if bn: m.append(wn(out_channels))
         if act is not None: m.append(act)
         super(BasicBlock, self).__init__(*m)
 
@@ -42,7 +42,7 @@ class ResBlock(nn.Module):
         super(ResBlock, self).__init__()
         m = []
         for i in range(2):
-            m.append(conv(n_feat, n_feat, kernel_size, bias=bias))
+            m.append(wn(conv(n_feat, n_feat, kernel_size, bias=bias)))
             if bn: m.append(nn.BatchNorm2d(n_feat))
             if i == 0: m.append(act)
 
@@ -61,7 +61,7 @@ class Upsampler(nn.Sequential):
         m = []
         if (scale & (scale - 1)) == 0:    # Is scale = 2^n?
             for _ in range(int(math.log(scale, 2))):
-                m.append(conv(n_feat, 4 * n_feat, 3, bias))
+                m.append(wn(conv(n_feat, 4 * n_feat, 3, bias)))
                 m.append(nn.PixelShuffle(2))
                 if bn: m.append(nn.BatchNorm2d(n_feat))
                 if act: m.append(act())
