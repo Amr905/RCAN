@@ -1,4 +1,4 @@
-from model import common
+from model import common_opt
 import torch
 import torch.nn as nn
 
