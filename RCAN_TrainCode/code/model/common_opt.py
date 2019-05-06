@@ -57,7 +57,7 @@ class ResBlock(nn.Module):
 
 class Upsampler(nn.Sequential):
     def __init__(self, conv, scale, n_feat, bn=False, act=False, bias=True):
-
+         wn = lambda x: torch.nn.utils.weight_norm(x)
         m = []
         if (scale & (scale - 1)) == 0:    # Is scale = 2^n?
             for _ in range(int(math.log(scale, 2))):
