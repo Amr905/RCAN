@@ -72,7 +72,7 @@ class ResidualGroup(nn.Module):
 
 ## Residual Channel Attention Network (RCAN)
 class RCAN(nn.Module):
-    def __init__(self, args, conv=common.default_conv):
+    def __init__(self, args, conv=common_opt.default_conv):
         super(RCAN, self).__init__()
 
         n_resgroups = args.n_resgroups
@@ -86,7 +86,7 @@ class RCAN(nn.Module):
         # RGB mean for DIV2K
         rgb_mean = (0.4488, 0.4371, 0.4040)
         rgb_std = (1.0, 1.0, 1.0)
-        self.sub_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std)
+        self.sub_mean = common_opt.MeanShift(args.rgb_range, rgb_mean, rgb_std)
 
         # define head module
         modules_head = [wn(conv(args.n_colors, n_feats, kernel_size))]
@@ -102,16 +102,16 @@ class RCAN(nn.Module):
 
         # define tail module
         modules_tail = [
-            common.Upsampler(conv, scale, n_feats, act=False),
+            common_opt.Upsampler(conv, scale, n_feats, act=False),
             wn(conv(n_feats, args.n_colors, kernel_size))]
         out_feats = scale*scale*args.n_colors
         #skip = []
         modules_skip = [conv(args.n_colors, n_feats, kernel_size)]
-        #modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
-        #modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
+        #modules_skip.append(common_opt.Upsampler(conv, scale, n_feats, act=False))
+        #modules_skip.append(common_opt.Upsampler(conv, scale, n_feats, act=False))
         modules_skip.append(nn.PixelShuffle(2));
         #modules_skip.append(conv(3, args.n_colors, kernel_size))
-        self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
+        self.add_mean = common_opt.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
         
         #self.skip = nn.Sequential(*modules_skip)
