@@ -71,7 +71,7 @@ class _MSDataLoaderIter(_DataLoaderIter):
                 multiprocessing.Queue() for _ in range(self.num_workers)
             ]
             self.worker_queue_idx = 0
-            self.worker_result_queue = multiprocessing.SimpleQueue()
+            self.worker_result_queue = multiprocessing.Queue()
             self.batches_outstanding = 0
             self.worker_pids_set = False
             self.shutdown = False
@@ -103,12 +103,7 @@ class _MSDataLoaderIter(_DataLoaderIter):
                 else:
                     # do not initialize cuda context if not necessary
                     maybe_device_id = None
-                self.worker_manager_thread = threading.Thread(
-                    target=_worker_manager_loop,
-                    args=(self.worker_result_queue, self.data_queue, self.done_event, self.pin_memory,
-                          maybe_device_id))
-                self.worker_manager_thread.daemon = True
-                self.worker_manager_thread.start()
+                self.pin_memory_thread = threading.Thread( target=_pin_memory_loop, args=(self.worker_result_queue, self.data_queue, maybe_device_id, self.done_event )) self.pin_memory_thread.daemon = True self.pin_memory_thread.start()
             else:
                 self.data_queue = self.worker_result_queue
 
