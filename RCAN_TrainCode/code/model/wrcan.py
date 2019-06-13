@@ -82,16 +82,19 @@ class RCAN(nn.Module):
         reduction = args.reduction
         scale = args.scale[0]
         act = nn.ReLU(True)
+        #wn is weight normalization
         wn = lambda x: torch.nn.utils.weight_norm(x)
         # RGB mean for DIV2K
         rgb_mean = (0.4488, 0.4371, 0.4040)
         rgb_std = (1.0, 1.0, 1.0)
         self.sub_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std)
 
-        # define head module
+        # define head module 
+        # apply Weight normalization
         modules_head = [wn(conv(args.n_colors, n_feats, kernel_size))]
 
         # define body module
+        # apply Weight normalization
         modules_body = [
             ResidualGroup(
                 conv, n_feats, kernel_size, reduction, act=act,
@@ -101,48 +104,28 @@ class RCAN(nn.Module):
         modules_body.append(wn(conv(n_feats, n_feats, kernel_size)))
 
         # define tail module
+        # apply Weight normalization
         modules_tail = [
             common.Upsampler(conv, scale, n_feats, act=False),
             wn(conv(n_feats, args.n_colors, kernel_size))]
         out_feats = scale*scale*args.n_colors
-        #skip = []
-        modules_skip = [conv(args.n_colors, n_feats, kernel_size)]
-        #modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
-        #modules_skip.append(common.Upsampler(conv, scale, n_feats, act=False))
-        modules_skip.append(nn.PixelShuffle(2));
-        #modules_skip.append(conv(3, args.n_colors, kernel_size))
-        self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
+        self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
         
-        #self.skip = nn.Sequential(*modules_skip)
         self.head = nn.Sequential(*modules_head)
         self.body = nn.Sequential(*modules_body)
         self.tail = nn.Sequential(*modules_tail)
         
     def forward(self, x):
-        
-        #x = (x - self.rgb_mean.cuda()*255)/127.5
+
         x = self.sub_mean(x)
-        #s = self.skip(x)
-        #v = self.skip(x)
-        #print (x)
         x = self.head(x)
-        #print (x)
-        #s = self.skip(x)
-        
-        #x = self.body(x)
-        
-        #x += s
-        
-        #x = self.tail(x)
-        #x += s
         res = self.body(x)
         res += x
-
+        
         x = self.tail(res)
         x = self.add_mean(x)
-        
-        #x += s+v
+      
         return x
 
     def load_state_dict(self, state_dict, strict=False):
