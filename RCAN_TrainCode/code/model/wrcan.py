@@ -70,8 +70,8 @@ class ResidualGroup(nn.Module):
         return res
 
 
-## Residual Channel Attention Network (RCAN)
-class RCAN(nn.Module):
+## WRCAN
+class WRCAN(nn.Module):
     def __init__(self, args, conv=common.default_conv):
         super(RCAN, self).__init__()
 
