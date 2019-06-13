@@ -89,12 +89,10 @@ class WRCAN(nn.Module):
         rgb_std = (1.0, 1.0, 1.0)
         self.sub_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std)
 
-        # define head module 
-        # apply Weight normalization
+        # define head module with Weight normalization
         modules_head = [wn(conv(args.n_colors, n_feats, kernel_size))]
-
-        # define body module
-        # apply Weight normalization
+        # define body module with Weight normalization
+       
         modules_body = [
             ResidualGroup(
                 conv, n_feats, kernel_size, reduction, act=act,
@@ -103,8 +101,7 @@ class WRCAN(nn.Module):
 
         modules_body.append(wn(conv(n_feats, n_feats, kernel_size)))
 
-        # define tail module
-        # apply Weight normalization
+        # define tail module with Weight normalization
         modules_tail = [
             common.Upsampler(conv, scale, n_feats, act=False),
             wn(conv(n_feats, args.n_colors, kernel_size))]
