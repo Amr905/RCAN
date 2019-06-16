@@ -100,7 +100,20 @@ class _MSDataLoaderIter(_DataLoaderIter):
                 else:
                     # do not initialize cuda context if not necessary
                     maybe_device_id = None
-                self.pin_memory_thread = threading.Thread( target=_utils.pin_memory._pin_memory_loop, args=(self.worker_result_queue, self.data_queue, maybe_device_id, self.done_event )) pin_memory_thread.daemon = True pin_memory_thread.start()
+                #self.pin_memory_thread = threading.Thread( target=_utils.pin_memory._pin_memory_loop, args=(self.worker_result_queue, self.data_queue, maybe_device_id, self.done_event )) pin_memory_thread.daemon = True pin_memory_thread.start()
+                pin_memory_thread = threading.Thread(
+                    target=_pin_memory_loop,
+                    target=_utils.pin_memory._pin_memory_loop,
+                    args=(
+                        self.worker_result_queue,
+                        self.data_queue,
+                        maybe_device_id,
+                        self.done_event
+                    )
+                )
+                pin_memory_thread.daemon = True
+                pin_memory_thread.start()
+                self.pin_memory_thread = pin_memory_thread
             else:
                 self.data_queue = self.worker_result_queue
 
