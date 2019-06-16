@@ -138,6 +138,6 @@ class MSDataLoader(DataLoader):
             *args, **kwargs, num_workers=cfg.n_threads)
 
         self.scale = cfg.scale
-
-    def __iter__(self):
+   
+   def __iter__(self):
         return _MSDataLoaderIter(self)
